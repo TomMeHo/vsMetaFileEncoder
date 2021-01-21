@@ -1,5 +1,8 @@
 # Special files
 test/TestVsMeta copy.py
+Scripts/
+*.code-workspace
+pyvenv.cfg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
