@@ -78,7 +78,6 @@ def readTemplateFile(filename: str) -> bytes:
 
 def writeVsMetaFile(filename: str, content: bytes):
 
-    # TODO remove this method
     with open(filename, 'wb') as writeFile:
         writeFile.write(content)
         writeFile.close()
