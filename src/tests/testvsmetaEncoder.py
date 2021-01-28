@@ -24,9 +24,6 @@ class TestVsMetaEncoder(unittest.TestCase):
 
         info.chapterSummary = "Zusammenfassung"
 
-        info.episode = 0 # TODO delete
-        info.season = 0 # TODO delete
-
         # execute, prepare result
         writer = VsMetaEncoder()
         testData = writer.encode(info)
@@ -38,7 +35,30 @@ class TestVsMetaEncoder(unittest.TestCase):
         compareBytesBitByBit(self, template, testData)
         compareBytesLength(self, template, testData)
 
+    def test_encodeTemplate3(self):
 
+        # setup class under test
+        info = VsMetaInfo()
+        info.showTitle = 'aaa20210122'
+        info.tvshowReleaseDate = date(2021, 1, 22)
+        info.tvshowLocked = True
+
+        info.episodeTitle = 'Episode'
+        info.episodeReleaseDate = date(2021, 1, 21)
+        info.episodeLocked = True
+
+        info.chapterSummary = "Text"
+
+        # execute, prepare result
+        writer = VsMetaEncoder()
+        testData = writer.encode(info)
+
+        writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'template3-reconstructed.vsmeta'), testData)
+
+        # compare
+        template = readTemplateFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"template3.vsmeta"))
+        compareBytesBitByBit(self, template, testData)
+        compareBytesLength(self, template, testData)
 
 if __name__ == "__main__":
     unittest.main()
