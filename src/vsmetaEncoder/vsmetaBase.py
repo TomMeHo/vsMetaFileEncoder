@@ -1,9 +1,13 @@
 from datetime import date
 from vsmetaEncoder.vsmetaInfo import VsMetaInfo
+from vsmetaEncoder.vsmetaListInfo import VsMetaListInfo
+from vsmetaEncoder.vsmetaImageInfo import VsMetaImageInfo
 
 class VsMetaBase():
 
-    TAG_FILE_HEADER = b'\x08\x02'
+    TAG_FILE_HEADER_MOVIE = b'\x08\x01'
+    TAG_FILE_HEADER_SERIES = b'\x08\x02'
+    TAG_FILE_HEADER_OTHER = b'\x08\x03'
 
     TAG_SHOW_TITLE = b'\x12'
     TAG_SHOW_TITLE2 = b'\x1A'
@@ -44,10 +48,101 @@ class VsMetaBase():
 
     def __init__(self):
 
-        self.encodedContent : bytes
+        self.encodedContent = bytes()
         self.info = VsMetaInfo()
 
-    def _writeTag(self, tag : bytes, value = None, intBytes : int = 1, signed : bool = True):
+    def encode(self, info : VsMetaInfo = None) -> bytes:
+
+        self.info = info
+        self._writeEncodedContent()
+        return self.encodedContent
+
+    # ------------------------------------
+    # Write at meta file level - using methods at lower level to "really" write at file level
+    # ------------------------------------
+    def _writeFileHeader(self):
+        self._writeTag( self.TAG_FILE_HEADER_OTHER )
+
+    def _writeShowTitle(self):
+        self._writeTag( self.TAG_SHOW_TITLE, self.info.showTitle2 or self.info.showTitle)
+        self._writeTag( self.TAG_SHOW_TITLE2, self.info.showTitle2 or self.info.showTitle)
+
+    def _writeEpisodeTitle(self):
+        self._writeTag( self.TAG_EPISODE_TITLE, self.info.episodeTitle)
+
+    def _writeEpisodeDate(self):
+        if self.info.year != 0: 
+            self._writeTag( self.TAG_YEAR, self.info.year, intBytes= 1 if self.info.year == 0 else 2)
+
+            if self.info.year != 0: self._writeTag( self.TAG_EPISODE_RELEASE_DATE, self.info.episodeReleaseDate)
+
+    def _writeEpisodeLocked(self, locked:bool=True):
+        self._writeTag( self.TAG_EPISODE_LOCKED, locked)
+
+    def _writeClassification(self):
+        self._writeTag( self.TAG_CLASSIFICATION, 0)
+
+    def _writeRating(self):
+        self._writeTag( self.TAG_RATING, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01')
+
+    def _writeSummary(self):
+        if len(self.info.chapterSummary) > 0:
+            self._writeTag(self.TAG_CHAPTER_SUMMARY, self.info.chapterSummary)
+
+    def _writeEncodedContent(self):
+        # intialization only, implementation in child classes
+        self.encodedContent = bytes()  # ensure empty.
+
+    def _writeEpisodeMetaJSON(self):
+        if len(self.info.episodeMetaJson) > 0:
+            self._writeTag( self.TAG_EPISODE_META_JSON, self.info.episodeMetaJson)
+
+    def _writeGroup1(self):
+        self._writeTag( self.info.TAG_GROUP1)
+        # TODO TAG1_CAST, GENRE, DIRECTOR, WRITER
+
+    def _writeGroup2(self):
+
+        #tv show year
+        tvshowYear = 0
+        if(self.info.tvshowReleaseDate.year != 1900): 
+            tvshowYear = self.info.tvshowReleaseDate.year
+            tvshowYear += 2048
+
+        self._writeTag( self.TAG_GROUP2)
+        self._writeTag( b'\x01') # group 2 - occurence no. 1?        
+        #group 2 payload
+        group2Content  = bytes()
+        group2Content += self.TAG2_SEASON + self._writeSpecialInt(self.info.season)
+        group2Content += self.TAG2_EPISODE + self._writeSpecialInt(self.info.episode)
+        if self.info.tvshowReleaseDate != date(1900, 1, 1): 
+            group2Content += self.TAG2_TV_SHOW_YEAR + self._writeInt(tvshowYear, 2, True)
+            group2Content += self.TAG2_RELEASE_DATE_TV_SHOW
+            group2Content += self._writeDate(self.info.tvshowReleaseDate)
+        else:
+            group2Content += self.TAG2_TV_SHOW_YEAR + self._writeInt(0, 1, True)
+        if self.info.tvshowLocked: group2Content += self.TAG2_LOCKED + self._writeBool(True)
+        if len(self.info.tvshowMetaJson) > 0:
+            group2Content += self.TAG2_TVSHOW_META_JSON
+            group2Content += self._writeStr(self.info.tvshowMetaJson)
+
+        group2Content = len(group2Content).to_bytes(1, 'big') + group2Content # length of group 2 payload
+
+        self.encodedContent += group2Content
+
+        # TODO tvshowsummary, 
+        # TODO tvshowposter, md5, tv_show_metajson
+        self._writeGroup3
+
+    def _writeGroup3(self, info: VsMetaInfo):
+        pass
+        # TODO tvshowBackdrop, MD5, timestamp
+
+    # ------------------------------------
+    # Write at file level
+    # ------------------------------------
+
+    def _writeTag(self, tag : bytes, value = None, intBytes : int = 0, signed : bool = True):
 
         #write tag
         self.encodedContent += self._writeBinary(tag)
@@ -55,7 +150,7 @@ class VsMetaBase():
 
         #write content
         if (type(value) == str):  self.encodedContent += self._writeStr(value)
-        if (type(value) == int):  self.encodedContent += self._writeInt(value, intBytes, signed)
+        if (type(value) == int):  self.encodedContent += self._writeSpecialInt(value)
         if (type(value) == date): self.encodedContent += self._writeDate(value)
         if (type(value) == bool): self.encodedContent += self._writeBool(value)
         if (type(value) == bytes): self.encodedContent += self._writeBinary(value)
@@ -79,13 +174,22 @@ class VsMetaBase():
         textAsByte  = bytes( text, encoding )
 
         returnValue = bytes()
-        returnValue += len(textAsByte).to_bytes(1, 'big')
+        lengthTByte = len(textAsByte)
+        returnValue += self._writeSpecialInt(lengthTByte)
         returnValue += textAsByte
         return returnValue
 
-    def _writeInt(self, numberValue : int = 0, bytesToUse : int = 1, signed : bool = True) -> bytes:
+    def _writeInt(self, numberValue : int = 0, bytesToUse : int = 0, signed : bool = True) -> bytes:
 
         returnValue = bytes()
+
+        # ok, the following looks very pragmatic...
+        if bytesToUse == 0:
+            bytesToUse = 1
+            if numberValue >= (2**(1*8)): bytesToUse = 2
+            if numberValue >= (2**16): bytesToUse = 3
+            if numberValue >= (2**24): bytesToUse = 4
+
         returnValue += numberValue.to_bytes(bytesToUse, byteorder="little", signed=signed)
         return returnValue
 
@@ -94,4 +198,21 @@ class VsMetaBase():
         returnValue = bytes()
         returnValue += b'\x0a' # length of date field, x0a = 10
         returnValue += bytes(dateValue.strftime("%Y-%m-%d"), 'utf-8' )
+        return returnValue
+
+    def _writeSpecialInt(self, valueI:int) -> bytes:
+
+        returnValue = b''
+        num = valueI
+        hasMore = True
+
+        while hasMore:
+            
+            value1 = (num & 0b01111111)
+            num = num >> 7
+            hasMore = False if num == 0 else True
+            value2 = 0x80 if hasMore else 0x00
+
+            returnValue += (value1 | value2).to_bytes(1, 'little')
+
         return returnValue
