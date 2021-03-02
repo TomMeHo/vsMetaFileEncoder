@@ -2,8 +2,6 @@ from datetime import date, datetime
 from vsmetaEncoder.vsmetaListInfo import VsMetaListInfo
 from vsmetaEncoder.vsmetaImageInfo import VsMetaImageInfo
 
-
-# TODO get rid of class
 class VsMetaInfo():
     def __init__(self):
 

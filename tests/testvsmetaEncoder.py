@@ -19,7 +19,6 @@ class TestVsMetaEncoder(unittest.TestCase):
         info.tvshowLocked = True
 
         info.episodeTitle = 'Skateboardcheck'
-        #info.episodeReleaseDate = date(2021, 1, 21)
         info.episodeLocked = True
         info.episodeMetaJson = "null"
         info.tvshowMetaJson = "null"
@@ -29,8 +28,6 @@ class TestVsMetaEncoder(unittest.TestCase):
         # execute, prepare result
         writer = VsMetaSeriesEncoder()
         testData = writer.encode(info)
-
-        # writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'template2-reconstructed.vsmeta'), testData)
 
         # compare
         template = readTemplateFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"template2.vsmeta"))
@@ -73,7 +70,6 @@ class TestVsMetaEncoder(unittest.TestCase):
         info.episodeLocked = True
 
         # execute, prepare result
-        #TODO clean-up writer = VsMetaEncoder()
         writer = VsMetaSeriesEncoder()
         testData = writer.encode(info)
 
@@ -91,7 +87,6 @@ class TestVsMetaEncoder(unittest.TestCase):
         info.setEpisodeDate(date(2021, 1, 1))
 
         # execute, prepare result
-        #TODO clean-up writer = VsMetaEncoder()
         writer = VsMetaMovieEncoder()
         testData = writer.encode(info)
 
@@ -111,7 +106,6 @@ class TestVsMetaEncoder(unittest.TestCase):
         info.chapterSummary = 'Im Italien-Teil seiner Sammlung "Années de pèlerinage" widmet sich Franz Liszt mehreren Sonetten von Francesco Petrarca.'
 
         # execute, prepare result
-        #TODO clean-up writer = VsMetaEncoder()
         writer = VsMetaMovieEncoder()
         testData = writer.encode(info)
 
