@@ -41,6 +41,8 @@ Here's an example piece of code. Other examples can be found in the unit test cl
             writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'videp.mp4.vsmeta'), writer.encode(info))
 ```
 
+The code is available on PyPI and can be installed with command `pip install vsMetaEncoder`.
+
 
 # Field mapping
 
@@ -76,7 +78,7 @@ To encode a TV film or movie, use the `vsMetaInfo` class with a `vsMetaMoviesEnc
 Field in Video Station | vsMetaInfo property | Remark
 ---------------------- | ------------------- | ----------------
 Title                  | `showTitle`
-Short Title          | `episodeTitle`
+Short Title            | `episodeTitle`
 Publishing Date        | `setEpisodeDate()`   | Use method instead of direct value assignment.
 Locked                 | `episodeLocked`
 Summary                | `chapterSummary`
