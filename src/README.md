@@ -29,17 +29,16 @@ Here's an example piece of code. Other examples can be found in the unit test cl
     class writeVsMetaForMovie():
 
         def test_encodeTemplate4(self):
-            
-            info = VsMetaInfo()
+
+            writer = VsMetaMovieEncoder()
+
+            info = writer.info
             info.episodeTitle = 'Nach der Hochzeit'
             info.showTitle = 'Kino - Filme'
             info.setEpisodeDate(date(2021, 3, 8))
             info.chapterSummary = 'Um die drohende Schließung seines indischen Waisenhauses abzuwenden...'
 
-        writer = VsMetaMovieEncoder()
-        encodedData = writer.encode(info)
-
-        writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'videp.mp4.vsmeta'), encodedData)
+            writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'videp.mp4.vsmeta'), writer.encode(info))
 ```
 
 
