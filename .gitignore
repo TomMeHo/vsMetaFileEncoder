@@ -4,6 +4,7 @@ src/Scripts/
 src/__setup__.py
 src/bin
 .vscode/
+venv_syno/
 
 *.code-workspace
 src/pyvenv.cfg

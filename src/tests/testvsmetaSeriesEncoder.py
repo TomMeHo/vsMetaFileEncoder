@@ -52,8 +52,6 @@ class TestVsMetaEncoder(unittest.TestCase):
         writer = VsMetaSeriesEncoder()
         testData = writer.encode(info)
 
-        writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'template3-reconstructed.vsmeta'), testData)
-
         # compare
         template = readTemplateFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"template3.vsmeta"))
         compareBytesBitByBit(self, template, testData)
@@ -73,46 +71,10 @@ class TestVsMetaEncoder(unittest.TestCase):
         writer = VsMetaSeriesEncoder()
         testData = writer.encode(info)
 
-        writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'template4-reconstructed.vsmeta'), testData)
+        #writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'template4-reconstructed.vsmeta'), testData)
 
         # compare
         template = readTemplateFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"template4.vsmeta"))
-        compareBytesBitByBit(self, template, testData)
-        compareBytesLength(self, template, testData)
-
-    def test_encodeTemplate6(self):
-        # setup class under test
-        info = VsMetaInfo()
-        info.episodeTitle = 'Filmtitel'
-        info.setEpisodeDate(date(2021, 1, 1))
-
-        # execute, prepare result
-        writer = VsMetaMovieEncoder()
-        testData = writer.encode(info)
-
-        writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'template-movie1-reconstructed.vsmeta'), testData)
-
-        # compare
-        template = readTemplateFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"template_movie1.vsmeta"))
-        compareBytesBitByBit(self, template, testData)
-        compareBytesLength(self, template, testData)
-
-    def test_encodeTemplate7(self):
-        # setup class under test
-        info = VsMetaInfo()
-        info.episodeTitle = 'Klassik'
-        info.showTitle = 'Franz Liszt: Sonetto di Petrarca'
-        info.setEpisodeDate(date(2019, 9, 24))
-        info.chapterSummary = 'Im Italien-Teil seiner Sammlung "Années de pèlerinage" widmet sich Franz Liszt mehreren Sonetten von Francesco Petrarca.'
-
-        # execute, prepare result
-        writer = VsMetaMovieEncoder()
-        testData = writer.encode(info)
-
-        writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'template-movie3-reconstructed.vsmeta'), testData)
-
-        # compare
-        template = readTemplateFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"template_movie3.vsmeta"))
         compareBytesBitByBit(self, template, testData)
         compareBytesLength(self, template, testData)
 

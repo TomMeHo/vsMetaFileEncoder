@@ -4,7 +4,6 @@ import os
 
 from vsmetaEncoder.vsmetaMovieEncoder import VsMetaBase
 from vsmetaEncoder.vsmetaInfo import VsMetaInfo
-from testHelpers import __prettyPrintBytesExtended
 
 
 class VsMetaEncoderBaseInjector(VsMetaBase):
@@ -91,7 +90,6 @@ class TestVsMetaEncoder(unittest.TestCase):
         testResult = cut.encodedContent
 
         self.assertEqual(testResult, expectedData, msg= "Encoding of episode date wrong.")
-
 
 if __name__ == "__main__":
     unittest.main()
