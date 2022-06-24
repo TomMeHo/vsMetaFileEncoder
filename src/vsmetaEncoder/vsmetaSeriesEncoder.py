@@ -19,6 +19,7 @@ class VsMetaSeriesEncoder(VsMetaBase):
         self._writeEpisodeMetaJSON()
         self._writeClassification()
         self._writeRating()
+        self._writePoster()
         self._writeGroup2()
 
     def _writeFileHeader(self):
