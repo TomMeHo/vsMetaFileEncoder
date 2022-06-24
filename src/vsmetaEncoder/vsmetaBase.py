@@ -126,12 +126,16 @@ class VsMetaBase():
             
         group2Content += self.TAG2_TVSHOW_SUMMARY + self._writeStr(self.info.tvshowSummary)
         
+        if self.info.images.tvshowPoster:
+            group2Content += self.TAG2_POSTER_DATA + self._writeImage(self.info.images.tvshowPoster)
+            group2Content += self.TAG2_POSTER_MD5 + self._writeMD5(self.info.images.tvshowPoster)
+          
         self._writeTag(self.TAG_GROUP2)
         self._writeTag(b'\x01') # group 2 - occurence no. 1?      
         self.encodedContent += self._writeSpecialInt(len(group2Content))
         self.encodedContent += group2Content
 
-        # TODO tvshowposter, md5, tv_show_metajson
+        # TODO tv_show_metajson
         self._writeGroup3
 
     def _writeGroup3(self, info: VsMetaInfo):
