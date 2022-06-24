@@ -155,6 +155,26 @@ class VsMetaBase():
         if (type(value) == bool): self.encodedContent += self._writeBool(value)
         if (type(value) == bytes): self.encodedContent += self._writeBinary(value)
 
+    def _writeImage(self, image) -> bytes:
+        import base64
+        converted_string = base64.b64encode(image)            
+        out_string = ''
+        count = 0
+        for char in converted_string.decode():
+            if count == 76:
+                count = 0
+                out_string += '\n'
+            out_string += char
+            count += 1
+        
+        returnValue = self._writeStr(text=out_string)
+        return returnValue
+
+    def _writeMD5(self, image) -> bytes:
+        import hashlib
+        returnValue = self._writeStr(text=hashlib.md5(image).hexdigest())
+        return returnValue
+    
     def _writeBinary(self, byteValue : bytes) -> bytes:
 
         returnValue = bytes()
