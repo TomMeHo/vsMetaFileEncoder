@@ -108,9 +108,7 @@ class VsMetaBase():
         if(self.info.tvshowReleaseDate.year != 1900): 
             tvshowYear = self.info.tvshowReleaseDate.year
             tvshowYear += 2048
-
-        self._writeTag( self.TAG_GROUP2)
-        self._writeTag( b'\x01') # group 2 - occurence no. 1?        
+  
         #group 2 payload
         group2Content  = bytes()
         group2Content += self.TAG2_SEASON + self._writeSpecialInt(self.info.season)
@@ -125,12 +123,14 @@ class VsMetaBase():
         if len(self.info.tvshowMetaJson) > 0:
             group2Content += self.TAG2_TVSHOW_META_JSON
             group2Content += self._writeStr(self.info.tvshowMetaJson)
-
-        group2Content = len(group2Content).to_bytes(1, 'big') + group2Content # length of group 2 payload
-
+            
+        group2Content += self.TAG2_TVSHOW_SUMMARY + self._writeStr(self.info.tvshowSummary)
+        
+        self._writeTag(self.TAG_GROUP2)
+        self._writeTag(b'\x01') # group 2 - occurence no. 1?      
+        self.encodedContent += self._writeSpecialInt(len(group2Content))
         self.encodedContent += group2Content
 
-        # TODO tvshowsummary, 
         # TODO tvshowposter, md5, tv_show_metajson
         self._writeGroup3
 
