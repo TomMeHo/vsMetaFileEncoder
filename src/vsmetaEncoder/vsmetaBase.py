@@ -62,7 +62,14 @@ class VsMetaBase():
     # ------------------------------------
     def _writeFileHeader(self):
         self._writeTag( self.TAG_FILE_HEADER_OTHER )
-
+        
+    def _writePoster(self):
+        self._writeTag(b'\x01')
+        
+        if self.info.images.episodeImage:
+            self.encodedContent += self.TAG_EPISODE_THUMB_DATA + b'\x01' + self._writeImage(self.info.images.episodeImage)
+            self.encodedContent += self.TAG_EPISODE_THUMB_MD5 + b'\x01' + self._writeMD5(self.info.images.episodeImage)
+           
     def _writeShowTitle(self):
         self._writeTag( self.TAG_SHOW_TITLE, self.info.showTitle2 or self.info.showTitle)
         self._writeTag( self.TAG_SHOW_TITLE2, self.info.showTitle2 or self.info.showTitle)
@@ -83,7 +90,7 @@ class VsMetaBase():
         self._writeTag( self.TAG_CLASSIFICATION, 0)
 
     def _writeRating(self):
-        self._writeTag( self.TAG_RATING, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01')
+        self._writeTag( self.TAG_RATING, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF')
 
     def _writeSummary(self):
         if len(self.info.chapterSummary) > 0:
