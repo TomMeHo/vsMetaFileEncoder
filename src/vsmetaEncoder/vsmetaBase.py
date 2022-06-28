@@ -62,7 +62,14 @@ class VsMetaBase():
     # ------------------------------------
     def _writeFileHeader(self):
         self._writeTag( self.TAG_FILE_HEADER_OTHER )
-
+        
+    def _writePoster(self):
+        self._writeTag(b'\x01')
+        
+        if self.info.images.episodeImage:
+            self.encodedContent += self.TAG_EPISODE_THUMB_DATA + b'\x01' + self._writeImage(self.info.images.episodeImage)
+            self.encodedContent += self.TAG_EPISODE_THUMB_MD5 + b'\x01' + self._writeMD5(self.info.images.episodeImage)
+           
     def _writeShowTitle(self):
         self._writeTag( self.TAG_SHOW_TITLE, self.info.showTitle2 or self.info.showTitle)
         self._writeTag( self.TAG_SHOW_TITLE2, self.info.showTitle2 or self.info.showTitle)
@@ -83,7 +90,7 @@ class VsMetaBase():
         self._writeTag( self.TAG_CLASSIFICATION, 0)
 
     def _writeRating(self):
-        self._writeTag( self.TAG_RATING, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01')
+        self._writeTag( self.TAG_RATING, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF')
 
     def _writeSummary(self):
         if len(self.info.chapterSummary) > 0:
@@ -108,9 +115,7 @@ class VsMetaBase():
         if(self.info.tvshowReleaseDate.year != 1900): 
             tvshowYear = self.info.tvshowReleaseDate.year
             tvshowYear += 2048
-
-        self._writeTag( self.TAG_GROUP2)
-        self._writeTag( b'\x01') # group 2 - occurence no. 1?        
+  
         #group 2 payload
         group2Content  = bytes()
         group2Content += self.TAG2_SEASON + self._writeSpecialInt(self.info.season)
@@ -125,13 +130,19 @@ class VsMetaBase():
         if len(self.info.tvshowMetaJson) > 0:
             group2Content += self.TAG2_TVSHOW_META_JSON
             group2Content += self._writeStr(self.info.tvshowMetaJson)
-
-        group2Content = len(group2Content).to_bytes(1, 'big') + group2Content # length of group 2 payload
-
+            
+        group2Content += self.TAG2_TVSHOW_SUMMARY + self._writeStr(self.info.tvshowSummary)
+        
+        if self.info.images.tvshowPoster:
+            group2Content += self.TAG2_POSTER_DATA + self._writeImage(self.info.images.tvshowPoster)
+            group2Content += self.TAG2_POSTER_MD5 + self._writeMD5(self.info.images.tvshowPoster)
+          
+        self._writeTag(self.TAG_GROUP2)
+        self._writeTag(b'\x01') # group 2 - occurence no. 1?      
+        self.encodedContent += self._writeSpecialInt(len(group2Content))
         self.encodedContent += group2Content
 
-        # TODO tvshowsummary, 
-        # TODO tvshowposter, md5, tv_show_metajson
+        # TODO tv_show_metajson
         self._writeGroup3
 
     def _writeGroup3(self, info: VsMetaInfo):
@@ -155,6 +166,26 @@ class VsMetaBase():
         if (type(value) == bool): self.encodedContent += self._writeBool(value)
         if (type(value) == bytes): self.encodedContent += self._writeBinary(value)
 
+    def _writeImage(self, image) -> bytes:
+        import base64
+        converted_string = base64.b64encode(image)            
+        out_string = ''
+        count = 0
+        for char in converted_string.decode():
+            if count == 76:
+                count = 0
+                out_string += '\n'
+            out_string += char
+            count += 1
+        
+        returnValue = self._writeStr(text=out_string)
+        return returnValue
+
+    def _writeMD5(self, image) -> bytes:
+        import hashlib
+        returnValue = self._writeStr(text=hashlib.md5(image).hexdigest())
+        return returnValue
+    
     def _writeBinary(self, byteValue : bytes) -> bytes:
 
         returnValue = bytes()
