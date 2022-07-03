@@ -4,7 +4,7 @@ import os
 
 from vsmetaEncoder.vsmetaMovieEncoder import VsMetaMovieEncoder
 from vsmetaEncoder.vsmetaInfo import VsMetaInfo
-from testHelpers import readTemplateFile, compareBytesBitByBit, compareBytesLength, writeVsMetaFile
+from testHelpers import readPosterVsMetaFile, readTemplateFile, compareBytesBitByBit, compareBytesLength, writeVsMetaFile
 
 class TestVsMetaEncoder(unittest.TestCase):
 
@@ -76,5 +76,39 @@ class TestVsMetaEncoder(unittest.TestCase):
         compareBytesBitByBit(self, template, testData)
         compareBytesLength(self, template, testData)
 
+    def test_encodeTemplate5Poster(self):
+        # setup class under test
+        
+        template = readTemplateFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"template_movie5_poster.vsmeta"))
+        testimage = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Testposter.jpg")
+        
+        
+        start_byte = VsMetaMovieEncoder.TAG_EPISODE_THUMB_DATA
+        end_byte = VsMetaMovieEncoder.TAG_EPISODE_THUMB_MD5
+        
+        readPosterVsMetaFile(template, testimage, start_byte, end_byte)
+        
+        info = VsMetaInfo()
+        info.episodeTitle = 'MovieTitle'
+        info.showTitle = 'Short summary of movie'
+        info.setEpisodeDate(date(2022, 7, 3))
+        info.chapterSummary = 'This is a long summary of a movie.'
+
+        with open(testimage, "rb") as image2string:
+            info.images.episodeImage = image2string.read()
+        os.remove(testimage)
+        
+        # execute, prepare result
+        writer = VsMetaMovieEncoder()
+        testData = writer.encode(info)
+
+        #writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'template_movie4-reconstructed.vsmeta'), testData)
+
+        # compare
+        compareBytesBitByBit(self, template, testData)
+        compareBytesLength(self, template, testData)
+
 if __name__ == "__main__":
     unittest.main()
+    
+    
