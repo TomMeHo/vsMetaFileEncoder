@@ -17,6 +17,7 @@ class VsMetaMovieEncoder(VsMetaBase):
         self._writeEpisodeMetaJSON()
         self._writeClassification()
         self._writeRating()
+        self._writePoster()
 
     def _writeFileHeader(self):
         self._writeTag(self.TAG_FILE_HEADER_MOVIE)

@@ -131,7 +131,8 @@ class VsMetaBase():
             group2Content += self.TAG2_TVSHOW_META_JSON
             group2Content += self._writeStr(self.info.tvshowMetaJson)
             
-        group2Content += self.TAG2_TVSHOW_SUMMARY + self._writeStr(self.info.tvshowSummary)
+        if len(self.info.tvshowSummary) > 0:
+            group2Content += self.TAG2_TVSHOW_SUMMARY + self._writeStr(self.info.tvshowSummary)
         
         if self.info.images.tvshowPoster:
             group2Content += self.TAG2_POSTER_DATA + self._writeImage(self.info.images.tvshowPoster)
