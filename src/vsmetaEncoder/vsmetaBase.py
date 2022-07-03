@@ -127,17 +127,18 @@ class VsMetaBase():
         else:
             group2Content += self.TAG2_TV_SHOW_YEAR + self._writeInt(0, 1, True)
         if self.info.tvshowLocked: group2Content += self.TAG2_LOCKED + self._writeBool(True)
-        if len(self.info.tvshowMetaJson) > 0:
-            group2Content += self.TAG2_TVSHOW_META_JSON
-            group2Content += self._writeStr(self.info.tvshowMetaJson)
-            
+
         if len(self.info.tvshowSummary) > 0:
             group2Content += self.TAG2_TVSHOW_SUMMARY + self._writeStr(self.info.tvshowSummary)
         
         if self.info.images.tvshowPoster:
             group2Content += self.TAG2_POSTER_DATA + self._writeImage(self.info.images.tvshowPoster)
             group2Content += self.TAG2_POSTER_MD5 + self._writeMD5(self.info.images.tvshowPoster)
-          
+        
+        if len(self.info.tvshowMetaJson) > 0:
+            group2Content += self.TAG2_TVSHOW_META_JSON
+            group2Content += self._writeStr(self.info.tvshowMetaJson)
+                      
         self._writeTag(self.TAG_GROUP2)
         self._writeTag(b'\x01') # group 2 - occurence no. 1?      
         self.encodedContent += self._writeSpecialInt(len(group2Content))

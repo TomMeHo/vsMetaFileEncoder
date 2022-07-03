@@ -88,6 +88,7 @@ def readPosterVsMetaFile(filename: str, filename_out_image: str, START_BYTE, END
     image_bytes = bytes()
     read_img = False
     read_img_other = False
+    last_byte = b""
     
     with BytesIO(filename) as f:
         byte = f.read(1)
@@ -96,16 +97,19 @@ def readPosterVsMetaFile(filename: str, filename_out_image: str, START_BYTE, END
             if byte == START_BYTE:
                 read_img=True
             
-            if byte == END_BYTE:
+            if byte == END_BYTE and last_byte == b"=":
                 read_img=False
                                 
             if read_img and not byte == START_BYTE:
                 if not byte == b'\n':
                     image_bytes += byte
                     
+            last_byte = byte
             byte = f.read(1)
-            
+                
     f = open(filename_out_image, "wb")
     f.write(base64.b64decode((image_bytes)))
     f.close()
+    
+    
     

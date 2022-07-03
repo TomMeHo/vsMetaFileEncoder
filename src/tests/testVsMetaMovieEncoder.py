@@ -83,8 +83,8 @@ class TestVsMetaEncoder(unittest.TestCase):
         testimage = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Testposter.jpg")
         
         
-        start_byte = VsMetaMovieEncoder.TAG_EPISODE_THUMB_DATA = b'\x8a'
-        end_byte = VsMetaMovieEncoder.TAG_EPISODE_THUMB_MD5 = b'\x92'
+        start_byte = VsMetaMovieEncoder.TAG_EPISODE_THUMB_DATA
+        end_byte = VsMetaMovieEncoder.TAG_EPISODE_THUMB_MD5
         
         readPosterVsMetaFile(template, testimage, start_byte, end_byte)
         
