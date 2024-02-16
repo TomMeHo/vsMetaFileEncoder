@@ -1,5 +1,6 @@
 import textwrap
 import json
+import hashlib
 from datetime import date, datetime
 
 
@@ -8,6 +9,10 @@ class VsMetaImageInfo:
         self.image = bytes()  # ByteString
         self.md5str = ""
         self.b64LastCharIsNewLine = False
+
+    def calcHashMd5Hex(self) -> str:
+        self.md5str = hashlib.md5(self.image).hexdigest()
+        return self.md5str
 
 
 class VsMetaListInfo:
@@ -48,7 +53,7 @@ class VsMetaInfo:
         self.tvshowReleaseDate = date(1900, 1, 1)
         self.tvshowLocked = True
         self.tvshowSummary = ""
-        self.posterImage = VsMetaImageInfo()
+        self.posterImageInfo = VsMetaImageInfo()
         self.tvshowMetaJson = "null"
 
         # Group3 Information:

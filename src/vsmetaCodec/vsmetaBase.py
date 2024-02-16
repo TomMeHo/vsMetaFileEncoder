@@ -84,9 +84,6 @@ class VsMetaBase:
 
         return
 
-    def contentHashMd5Hex(self) -> str:
-        return self.encContent.hashMd5Hex()
-
     def writeVsMetaFile(self, file_path: str):
         self.encContent.writeToFile(file_path)
 
@@ -184,7 +181,7 @@ class VsMetaBase:
         if len(self.info.tvshowSummary) > 0:
             grp2_content.writeTag(self.TAG2_TVSHOW_SUMMARY, self.info.tvshowSummary)
 
-        image_bytes = None if self.info.posterImage is None else self.info.posterImage.image
+        image_bytes = None if self.info.posterImageInfo is None else self.info.posterImageInfo.image
         if image_bytes is not None and len(image_bytes) > 0:
             grp2_content.writeTag(self.TAG2_POSTER_DATA, self.b64encodeImage(image_bytes))
             grp2_content.writeTag(self.TAG2_POSTER_MD5, self.calcMD5(image_bytes))

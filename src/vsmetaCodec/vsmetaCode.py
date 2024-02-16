@@ -1,5 +1,4 @@
-from datetime import date   # , datetime,  timezone
-import hashlib
+from datetime import date
 import base64
 
 
@@ -13,9 +12,6 @@ class VsMetaCode(bytes):
 
     def data(self) -> bytes:
         return self._data
-
-    def hashMd5Hex(self) -> str:
-        return hashlib.md5(self._data).hexdigest()
 
     def writeToFile(self, file_path: str):
         if len(self._data) > 0:
@@ -96,7 +92,7 @@ class VsMetaCode(bytes):
             return
         # write content
         if type(value) is int:
-            self._data += self.calcSpecialInt(value)
+            self._data += self.specialInt(value)
         elif type(value) is str:
             self.writeStr(value)
         elif type(value) is date:
@@ -114,7 +110,7 @@ class VsMetaCode(bytes):
         # byteOrderMark \xEF\xBB\xBF is written automatically when using utf-8-sig.
         encoding = 'utf-8-sig' if with_bom else 'utf-8'
         text_bytes = bytes(text, encoding)
-        self._data += self.calcSpecialInt(len(text_bytes)) + text_bytes
+        self._data += self.specialInt(len(text_bytes)) + text_bytes
 
     def _writeDate(self, date_value: date):
         # length of date string: x0a = 10
@@ -127,11 +123,11 @@ class VsMetaCode(bytes):
         self._data += byte_value
 
     def _writeContent(self, value):
-        self._data += self.calcSpecialInt(len(value)) + value.data()
+        self._data += self.specialInt(len(value)) + value.data()
 
     # --------------- public methods which don't access self._data as of here ----------------
     @staticmethod
-    def calcSpecialInt(num: int) -> bytes:
+    def specialInt(num: int) -> bytes:
         if num < 0:
             return b'\x00'          # may be better to raise an exception here ?!
         return_value = b''

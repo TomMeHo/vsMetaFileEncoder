@@ -100,7 +100,7 @@ class VsMetaDecoder(VsMetaBase):
         return code.byteCountAhead()
 
     def _readGroup2(self, code: VsMetaCode) -> int:
-        self.info.posterImage = VsMetaImageInfo()
+        self.info.posterImageInfo = VsMetaImageInfo()
         while code.byteCountAhead() > 0:
             tag = code.readTag()
             if tag == self.TAG2_SEASON:
@@ -116,10 +116,10 @@ class VsMetaDecoder(VsMetaBase):
             elif tag == self.TAG2_TVSHOW_SUMMARY:
                 self.info.tvshowSummary = code.readString()
             elif tag == self.TAG2_POSTER_DATA:
-                (self.info.posterImage.image,
-                 self.info.posterImage.b64LastCharIsNewLine) = code.readImage()
+                (self.info.posterImageInfo.image,
+                 self.info.posterImageInfo.b64LastCharIsNewLine) = code.readImage()
             elif tag == self.TAG2_POSTER_MD5:
-                self.info.posterImage.md5str = code.readString()
+                self.info.posterImageInfo.md5str = code.readString()
             elif tag == self.TAG2_TVSHOW_META_JSON:
                 self.info.tvshowMetaJson = code.readString()
             elif tag == self.TAG2_GROUP3:
