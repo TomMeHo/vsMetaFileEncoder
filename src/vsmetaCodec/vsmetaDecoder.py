@@ -6,29 +6,21 @@ from vsmetaCodec.vsmetaCode import VsMetaCode
 
 class VsMetaDecoder(VsMetaBase):
 
-    def __init__(self):
-        super(VsMetaDecoder, self).__init__()
-        self._header = VsMetaBase.TAG_FILE_HEADER_OTHER
-        self.info = VsMetaInfo()
-        self.info.episodeLocked = False
-
     def decode(self, encoded_data: bytes = None) -> int:
         if encoded_data is not None:
-            self.__init__()
+            self.info = VsMetaInfo()
+            self.info.episodeLocked = False
             self.encContent = VsMetaCode(encoded_data)
+        return self._readVsMetaEncoded(self.encContent)
 
-        tag = self.encContent.readHeader()
+    def _readVsMetaEncoded(self, code: VsMetaCode) -> int:
+        tag = code.readHeader()
         if tag != self.TAG_FILE_HEADER_MOVIE and\
                 tag != self.TAG_FILE_HEADER_SERIES:
             error = "This is not a vsmeta movie or series file"
             raise Exception(error)
-        else:
-            self._header = tag
-        return self._readVsMetaEncoded(self.encContent)
 
-    def _readVsMetaEncoded(self, code: VsMetaCode) -> int:
         episode_img = VsMetaImageInfo()
-
         while code.byteCountAhead() > 0:
             tag = code.readTag()
             if tag == self.TAG_SHOW_TITLE:

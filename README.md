@@ -14,7 +14,7 @@ Example: The video is called `video.mpg`, the metadata file shall be named `vide
 
 ## Limitations
 * Media type 'others' is currently not supported.
-* Some fields are not yet supported. See list below.
+* All known fields are supported in this version (See list below).
 
 ## How to use the code
 
@@ -34,15 +34,15 @@ Here's an example piece of code. Other examples can be found in the unit test cl
             writer = VsMetaMovieEncoder()
 
             info = writer.info
-            info.episodeTitle = 'Nach der Hochzeit'
             info.showTitle = 'Kino - Filme'
-            info.setEpisodeDate(date(2021, 3, 8))
+            info.episodeTitle = 'Nach der Hochzeit'
+            info.episodeReleaseDate = date(2021, 3, 8)
             info.chapterSummary = 'Um die drohende Schließung seines indischen Waisenhauses abzuwenden...'
 
             writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'videp.mp4.vsmeta'), writer.encode(info))
 ```
 
-The code is available on PyPI and can be installed with command `pip install vsMetaEncoder`.
+The code will be available on PyPI soon and can be installed with command `pip install vsMetaCodec`.
 
 
 # Field mapping
@@ -54,45 +54,50 @@ Here's how to use the vsMetaInfo class for the different media types.
 To encode the episode of a series, use the `vsMetaInfo` class with a `vsMetaSeriesEncoder`.
 Have a look at the test classes to see how it works best. The table below describes how to set the `vsMetaInfo` properties.
 
-| Field in Video Station    | vsMetaInfo property       | Remark                                                                         |
-|---------------------------|---------------------------|--------------------------------------------------------------------------------|
-| TV Show Name              | `showTitle`               |                                                                                |
-| Publishing Date           | `setEpisodeReleaseDate()` | Use method instead of direct value assignment.                                 |
-| Episode Title             | `episodeTitle`            |                                                                                |
-| Season                    | `season`                  | If not set, defaulted with publishing year of episode.                         |
-| Episode                   | `episode`                 | If not set, defaulted with week number x 10 plus weekday number (Monday is 1). |
-| Publishing Date (Episode) | `setShowDate()`           | Use method instead of direct value assignment.                                 |
-| Locked                    | `episodeLocked`           |                                                                                |
-| Summary                   | `chapterSummary`          |                                                                                |
-
-Not supported yet:
-
-* Classification
-* Rating
-* Genre
-* Cast
-* Author
+| Field in Video Station    | vsMetaInfo property       | Remark                                                                      |
+|---------------------------|---------------------------|-----------------------------------------------------------------------------|
+| TV Show Name              | `showTitle`               | assign any tv show name as text of type 'str'                               |
+| Episode Title             | `episodeTitle`            | assign any text of type 'str'                                               |
+| Publishing Date           | `episodeReleaseDate`      | assign any date of type 'date' or 'str' in ISO format                       |
+| Season                    | `season`                  | type int: If not set, defaulted with publishing year of episode.            |
+| Episode                   | `episode`                 | type int: If not set, defaulted with week no. x 10 + weekday no. (Monday=1) |
+| Publishing Date (Episode) | `tvshowReleaseDate`       | assign any date of type 'date' or 'str' in ISO format                       |
+| Poster (of Serie)         | `posterImageInfo.image`   | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
+| Locked                    | `episodeLocked`           | assign 'True' if 'VideoStation' may not alter the vsmeta file content       |
+| Summary                   | `chapterSummary`          | assign any text of type 'str'                                               |
+| Classification            | `classification`          | assign any text of type 'str'                                               |
+| Rating                    | `rating`                  | assign any float value in the range of 0.0. to 10.0 or -1.0 for unknown     |
+| Cast                      | `list.cast[]`             | append 'actor names' of type 'str' to the list                              |
+| Genre                     | `list.genre[]`            | append 'genres' of type 'str' to the list, e.g. 'Drama', 'Action'           |
+| Director                  | `list.director[]`         | append 'director names' of type 'str' to the list                           |
+| Writer                    | `list.writer[]`           | append 'author names' of type 'str' to the list                             |
+| Poster (of Episode)       | `episodeImageInfo.image`  | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
+| Background (of Serie)     | `backdropImageInfo.image` | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
 
 ## Movies
 
 To encode a TV film or movie, use the `vsMetaInfo` class with a `vsMetaMoviesEncoder`.
 The property names might be confusing, don't think too much about it - just use them as listed below.
 
-| Field in Video Station | vsMetaInfo property | Remark                                                               |
-|------------------------|---------------------|----------------------------------------------------------------------|
-| Title                  | `showTitle`         |                                                                      |
-| Short Title            | `episodeTitle`      |                                                                      |
-| Publishing Date        | `setEpisodeDate()`  | Use method instead of direct value assignment.                       |
-| Locked                 | `episodeLocked`     |                                                                      |
-| Summary                | `chapterSummary`    |                                                                      |
-
-Not supported yet: 
-
-* Classification
-* Rating
-* Genre
-* Cast
-* Author
+| Field in Video Station    | vsMetaInfo property       | Remark                                                                      |
+|---------------------------|---------------------------|-----------------------------------------------------------------------------|
+| Title                     | `showTitle`               | assign any title text of type 'str'                                         |
+| Short Title               | `episodeTitle`            | assign any short title text of type 'str'                                   |
+| Publishing Date           | `episodeReleaseDate`      | assign any date of type 'date' or 'str' in ISO format                       |
+| Season                    | `season`                  | N/A - not used, set to 0                                                    |
+| Episode                   | `episode`                 | N/A - not used, set to 0                                                    |
+| Publishing Date (Episode) | `tvshowReleaseDate`       | N/A - not used, set to 1900-01-01                                           |
+| Poster (of Serie)         | `posterImageInfo.image`   | N/A - not used, set to VsImageInfo()                                        |
+| Locked                    | `episodeLocked`           | assign 'True' if 'VideoStation' may not alter the vsmeta file content       |
+| Summary                   | `chapterSummary`          | assign any text of type 'str'                                               |
+| Classification            | `classification`          | assign any text of type 'str'                                               |
+| Rating                    | `rating`                  | assign any float value in the range of 0.0. to 10.0 or -1.0 for unknown     |
+| Cast                      | `list.cast[]`             | append 'actor names' of type 'str' to the list                              |
+| Genre                     | `list.genre[]`            | append 'genres' of type 'str' to the list, e.g. 'Drama', 'Action'           |
+| Director                  | `list.director[]`         | append 'director names' of type 'str' to the list                           |
+| Writer                    | `list.writer[]`           | append 'author names' of type 'str' to the list                             |
+| Poster (of Movie)         | `episodeImageInfo.image`  | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
+| Background (of Movie)     | `backdropImageInfo.image` | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
 
 ## Media type 'other'
 

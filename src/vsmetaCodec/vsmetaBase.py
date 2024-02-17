@@ -1,4 +1,3 @@
-import hashlib
 import base64
 from datetime import datetime, date
 from vsmetaCodec.vsmetaInfo import VsMetaInfo
@@ -99,6 +98,22 @@ class VsMetaBase:
             year = release_date.year
         return year if year != 1900 else 0
 
+    @staticmethod
+    def b64encodeImage(image: bytes, last_char_nl: bool = False) -> str:
+        converted_string = base64.b64encode(image).decode()
+        b64_enc_str = ''
+        length = len(converted_string)
+        block_size = 76
+        for pos in range(0, length - 1, block_size):  # insert '\n' every 76 characters
+            if (length - pos) < block_size:
+                block_size = length - pos
+            b64_enc_str += converted_string[pos:pos + block_size]
+            if block_size == length - pos:  # last block ?
+                b64_enc_str += '\n' if last_char_nl else ''
+            else:
+                b64_enc_str += '\n'  # not the last block -> append '\n'
+        return b64_enc_str
+
     # -------------------------------------------------------
     # Write here on meta level, stored low level with instance of VsMetaCode()
     # -------------------------------------------------------
@@ -147,7 +162,7 @@ class VsMetaBase:
             image_str = self.b64encodeImage(episode_img.image, episode_img.b64LastCharIsNewLine)
             self.encContent.writeTag(int(index + 1).to_bytes(1, 'big'), image_str)
             self.encContent.writeTag(self.TAG_EPISODE_THUMB_MD5)
-            self.encContent.writeTag(int(index + 1).to_bytes(1, 'big'), episode_img.md5str)
+            self.encContent.writeTag(int(index + 1).to_bytes(1, 'big'), episode_img.calcHashMd5Hex())
 
     def _writeGroup1(self):
         # group 1 payload
@@ -181,10 +196,11 @@ class VsMetaBase:
         if len(self.info.tvshowSummary) > 0:
             grp2_content.writeTag(self.TAG2_TVSHOW_SUMMARY, self.info.tvshowSummary)
 
-        image_bytes = None if self.info.posterImageInfo is None else self.info.posterImageInfo.image
+        img_info = self.info.posterImageInfo
+        image_bytes = None if img_info is None else img_info.image
         if image_bytes is not None and len(image_bytes) > 0:
             grp2_content.writeTag(self.TAG2_POSTER_DATA, self.b64encodeImage(image_bytes))
-            grp2_content.writeTag(self.TAG2_POSTER_MD5, self.calcMD5(image_bytes))
+            grp2_content.writeTag(self.TAG2_POSTER_MD5, img_info.calcHashMd5Hex())
 
         if len(self.info.tvshowMetaJson) > 0:
             grp2_content.writeTag(self.TAG2_TVSHOW_META_JSON, self.info.tvshowMetaJson)
@@ -199,39 +215,18 @@ class VsMetaBase:
             self.encContent.writeTag(b'\x01', grp2_content)     # group 2 - occurence no. \x01?
 
     def _writeGroup3(self) -> VsMetaCode:
-        # group3 content may not be written to self.encContent directly, because it is also written into
-        # group2 content for encoding of TV-Series.
-        # Remark: The returned bytes don't yet include a group3 TAG or length of the package.
-        # This has to be preceded by the calling method differently for movies (TAG_GROUP3) and series (TAG2_GROUP3).
+        # group3 content may not be written to self.encContent directly, because it is also written into the group2
+        # content when encoding TV-Series.
+        # Remark: The returned bytes don't yet include a group3 TAG or length of the package, as this has to be done
+        # by the method  calling _writeGroup3() in different ways for movies (TAG_GROUP3) and series (TAG2_GROUP3).
         grp3_content = VsMetaCode()
-        if self.info.backdropImageInfo.image is not None\
-                and len(self.info.backdropImageInfo.image) > 0\
+        img_info = self.info.backdropImageInfo
+        if img_info.image is not None and len(img_info.image) > 0\
                 and self.info.timestamp > int(datetime(1900, 1, 1, 0, 0).timestamp()):
             # group 3 payload = backdrop_data, backdrop_MD5, timestamp
-            img_info = self.info.backdropImageInfo
             image_str = self.b64encodeImage(img_info.image, img_info.b64LastCharIsNewLine)
             grp3_content.writeTag(self.TAG3_BACKDROP_DATA, image_str)
-            grp3_content.writeTag(self.TAG3_BACKDROP_MD5, self.calcMD5(img_info.image))
+            grp3_content.writeTag(self.TAG3_BACKDROP_MD5, img_info.calcHashMd5Hex())
             grp3_content.writeTag(self.TAG3_TIMESTAMP, int(self.info.timestamp))
 
         return grp3_content     # return the grp3_content (it might be empty!)
-
-    @staticmethod
-    def calcMD5(image: bytes) -> str:
-        return hashlib.md5(image).hexdigest()
-
-    @staticmethod
-    def b64encodeImage(image: bytes, last_char_nl: bool = False) -> str:
-        converted_string = base64.b64encode(image).decode()
-        b64_enc_str = ''
-        length = len(converted_string)
-        block_size = 76
-        for pos in range(0, length - 1, block_size):  # insert '\n' every 76 characters
-            if (length - pos) < block_size:
-                block_size = length - pos
-            b64_enc_str += converted_string[pos:pos + block_size]
-            if block_size == length - pos:  # last block ?
-                b64_enc_str += '\n' if last_char_nl else ''
-            else:
-                b64_enc_str += '\n'  # not the last block -> append '\n'
-        return b64_enc_str
