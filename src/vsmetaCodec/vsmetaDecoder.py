@@ -62,9 +62,9 @@ class VsMetaDecoder(VsMetaBase):
                 (episode_img.image,
                  episode_img.b64LastCharIsNewLine) = code.readImage()
             elif tag == self.TAG_EPISODE_THUMB_MD5:
-                if code.readInt(1) != 1:    # index value, not used and not stored
-                    raise Exception("Index of episode_thumb_md5 is not \\x01 !")
-                episode_img.md5str = code.readString()
+                code.readInt(1)             # index value, not used and not stored
+                if code.readString() != episode_img.md5str:
+                    raise Exception("vsmeta md5-hash for episodeImage doesn't match with image byte-string!")
                 self.info.episodeImageInfo.append(episode_img)
             else:
                 code.dumpData(32)
@@ -111,7 +111,8 @@ class VsMetaDecoder(VsMetaBase):
                 (self.info.posterImageInfo.image,
                  self.info.posterImageInfo.b64LastCharIsNewLine) = code.readImage()
             elif tag == self.TAG2_POSTER_MD5:
-                self.info.posterImageInfo.md5str = code.readString()
+                if code.readString() != self.info.posterImageInfo.md5str:
+                    raise Exception("vsmeta md5-hash for poster image doesn't match with image byte-string!")
             elif tag == self.TAG2_TVSHOW_META_JSON:
                 self.info.tvshowMetaJson = code.readString()
             elif tag == self.TAG2_GROUP3:
@@ -131,7 +132,8 @@ class VsMetaDecoder(VsMetaBase):
                 (self.info.backdropImageInfo.image,
                  self.info.backdropImageInfo.b64LastCharIsNewLine) = code.readImage()
             elif tag == self.TAG3_BACKDROP_MD5:
-                self.info.backdropImageInfo.md5str = code.readString()
+                if code.readString() != self.info.backdropImageInfo.md5str:
+                    raise Exception("vsmeta md5-hash for backdrop image doesn't match with image byte-string!")
             elif tag == self.TAG3_TIMESTAMP:
                 self.info.timestamp = code.readTimeStamp()
             else:

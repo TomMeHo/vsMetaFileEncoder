@@ -6,13 +6,18 @@ from datetime import date, datetime
 
 class VsMetaImageInfo:
     def __init__(self):
+        self.md5str = ""      # assign before self.image is assigned, because of @image.setter assignment
         self.image = bytes()  # ByteString
-        self.md5str = ""
         self.b64LastCharIsNewLine = False
 
-    def calcHashMd5Hex(self) -> str:
-        self.md5str = hashlib.md5(self.image).hexdigest()
-        return self.md5str
+    @property
+    def image(self) -> bytes:
+        return self._image
+
+    @image.setter
+    def image(self, new_image: bytes):
+        self._image = new_image
+        self.md5str = hashlib.md5(new_image).hexdigest()
 
 
 class VsMetaListInfo:

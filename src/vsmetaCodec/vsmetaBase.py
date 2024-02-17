@@ -162,7 +162,7 @@ class VsMetaBase:
             image_str = self.b64encodeImage(episode_img.image, episode_img.b64LastCharIsNewLine)
             self.encContent.writeTag(int(index + 1).to_bytes(1, 'big'), image_str)
             self.encContent.writeTag(self.TAG_EPISODE_THUMB_MD5)
-            self.encContent.writeTag(int(index + 1).to_bytes(1, 'big'), episode_img.calcHashMd5Hex())
+            self.encContent.writeTag(int(index + 1).to_bytes(1, 'big'), episode_img.md5str)
 
     def _writeGroup1(self):
         # group 1 payload
@@ -200,7 +200,7 @@ class VsMetaBase:
         image_bytes = None if img_info is None else img_info.image
         if image_bytes is not None and len(image_bytes) > 0:
             grp2_content.writeTag(self.TAG2_POSTER_DATA, self.b64encodeImage(image_bytes))
-            grp2_content.writeTag(self.TAG2_POSTER_MD5, img_info.calcHashMd5Hex())
+            grp2_content.writeTag(self.TAG2_POSTER_MD5, img_info.md5str)
 
         if len(self.info.tvshowMetaJson) > 0:
             grp2_content.writeTag(self.TAG2_TVSHOW_META_JSON, self.info.tvshowMetaJson)
@@ -226,7 +226,7 @@ class VsMetaBase:
             # group 3 payload = backdrop_data, backdrop_MD5, timestamp
             image_str = self.b64encodeImage(img_info.image, img_info.b64LastCharIsNewLine)
             grp3_content.writeTag(self.TAG3_BACKDROP_DATA, image_str)
-            grp3_content.writeTag(self.TAG3_BACKDROP_MD5, img_info.calcHashMd5Hex())
+            grp3_content.writeTag(self.TAG3_BACKDROP_MD5, img_info.md5str)
             grp3_content.writeTag(self.TAG3_TIMESTAMP, int(self.info.timestamp))
 
         return grp3_content     # return the grp3_content (it might be empty!)
