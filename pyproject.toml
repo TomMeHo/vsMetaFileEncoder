@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vsmetaEncoder"
+version = "0.9.1"
+authors = [
+  { name="Thomas Meder", email="tom@tommho.net" },
+  { name="Bernd Frey", email="bfy@online.de" },
+
+]
+description = "A module to encode and decode media information with Synology's vsmeta file format."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers=[
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: System :: Logging",
+]
+
+[project.urls]
+Homepage = "https://github.com/Berfre/vsMetaFileCodec"
+Issues = "https://github.com/Berfre/vsMetaFileCodec/issues"
