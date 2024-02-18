@@ -41,7 +41,7 @@ class VsMetaInfo:
         self.episodeLocked = True
 
         self.chapterSummary = ""
-        self.episodeMetaJson = "null"       # Berfre: correct initialization for an 'empty json string'
+        self.episodeMetaJson = "null"       # VsMetaInfo internally stores serialized json string
         self.tmdbReference = {}             # convenience dictionary to access tmdb-id and imdb-id
 
         self.classification = ""
@@ -83,6 +83,17 @@ class VsMetaInfo:
         self.episodeReleaseDate = episode_date
 
     @property
+    def episodeMetaJson(self) -> str:
+        return self._episodeMetaJson
+
+    @episodeMetaJson.setter
+    def episodeMetaJson(self, meta_json: dict | str):
+        if type(meta_json) is dict:
+            self._episodeMetaJson = json.dumps(meta_json, separators=(',', ':'))
+        elif type(meta_json) is str:
+            self._episodeMetaJson = meta_json
+
+    @property
     def tvshowReleaseDate(self) -> date:
         return self._tvshowReleaseDate
 
@@ -99,6 +110,17 @@ class VsMetaInfo:
 
     def setShowDate(self, show_date: str | date):
         self.tvshowReleaseDate = show_date
+
+    @property
+    def tvshowMetaJson(self) -> str:
+        return self._tvshowMetaJson
+
+    @tvshowMetaJson.setter
+    def tvshowMetaJson(self, meta_json: dict | str):
+        if type(meta_json) is dict:
+            self._tvshowMetaJson = json.dumps(meta_json, separators=(',', ':'))
+        elif type(meta_json) is str:
+            self._tvshowMetaJson = meta_json
 
     @property
     def timestamp(self) -> int:

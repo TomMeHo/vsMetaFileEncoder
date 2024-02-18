@@ -76,7 +76,7 @@ class VsMetaCode(bytes):
 
     def readImage(self) -> (bytes, bool):
         image_str = self._readData(self.readSpecialInt())
-        last_char_is_newline = (image_str[-1] == b'\n')
+        last_char_is_newline = (image_str[-1] == b'\n'[0])    # 10 represents '\n'
         return base64.decodebytes(image_str), last_char_is_newline
 
     def dumpData(self, num_bytes: int) -> None:

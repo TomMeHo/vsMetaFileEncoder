@@ -202,7 +202,7 @@ class VsMetaBase:
             grp2_content.writeTag(self.TAG2_POSTER_DATA, self.b64encodeImage(image_bytes))
             grp2_content.writeTag(self.TAG2_POSTER_MD5, img_info.md5str)
 
-        if len(self.info.tvshowMetaJson) > 0:
+        if self.info.tvshowMetaJson is not None and len(self.info.tvshowMetaJson) > 0:
             grp2_content.writeTag(self.TAG2_TVSHOW_META_JSON, self.info.tvshowMetaJson)
 
         grp3_content = VsMetaBase._writeGroup3(self)    # call the base-class implementation directly, because
