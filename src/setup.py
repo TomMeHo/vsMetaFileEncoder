@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
       name='vsmetaCodec',
-      version='0.9.1',
+      version='1.0.0',
       description='A module to encode and decode media information with Synology\'s vsmeta file format.',
       long_description=long_description,
       long_description_content_type="text/markdown",
