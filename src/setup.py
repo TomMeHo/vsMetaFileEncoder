@@ -3,14 +3,15 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-setuptools.setup(name='vsmetaEncoder',
-      version='0.9',
-      description='A module to encode media information with Synology\'s vsmeta file format.',
+setuptools.setup(
+      name='vsmetaCodec',
+      version='0.9.1',
+      description='A module to encode and decode media information with Synology\'s vsmeta file format.',
       long_description=long_description,
       long_description_content_type="text/markdown",
-      url='https://github.com/TomMeHo/vsMetaFileEncoder',
-      author='Thomas Meder',
-      author_email='tom@tommho.net',
+      url='https://github.com/berfre/vsMetaFileCodec',
+      author='Bernd Frey',
+      author_email='bfy@online.de',
       license='BSD',
       packages=setuptools.find_packages(),
       zip_safe=False,

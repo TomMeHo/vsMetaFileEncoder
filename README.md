@@ -1,20 +1,20 @@
-# About VsMetaFileEncoder
+# About VsMetaFileCodec
 ## Summary
 NAS manufacturer [Synology](https://www.synology.com/) provides, for its network attached storage devices (NAS), a video content manager called *Video Station*. The application enables the NAS to stream videos over your LAN. Information about these videos are stored in a local Postgres database and optionally by files with extension *.vsmeta*. The format is proprietary. 
-The tool provided here is able to write vsMetaFiles. The structure has been elaborated by reverse engineering and ressources found [here](https://gist.github.com/soywiz/2c10feb1231e70aca19a58aca9d6c16a). Many thanks to [Carlos Ballesteros Velasco](https://github.com/soywiz).
+The tool provided here is able to read and write vsMetaFiles. The structure has been elaborated by reverse engineering and resources found [here](https://gist.github.com/soywiz/2c10feb1231e70aca19a58aca9d6c16a). Many thanks to [Carlos Ballesteros Velasco](https://github.com/soywiz).
 
 ## Prerequisites
 Once a video is written into a directory, *Video Station* looks for *.vsmeta* files if these conditions are met:
 * The folder is part of a *Video Station* library.
-* At least once, an export of meta data has been triggered. This can be done at the library settings of Video Station.
+* At least once, an export of metadata has been triggered. This can be done at the library settings of Video Station.
 * The *.vsmeta* file has the same name as the video, appended by *.vsmeta*.
-Example: The video is called `video.mpg`, the meta data file shall be named `video.mpg.vsmeta`.
+Example: The video is called `video.mpg`, the metadata file shall be named `video.mpg.vsmeta`.
 * The *.vsmeta* file is available when *Video Station* indexes the video file first time.
 * The content type (movie, series, other) is equal to the type specified in the *.vsmeta* file.
 
 ## Limitations
 * Media type 'others' is currently not supported.
-* Some fields are not yet supported. See list below.
+* All known fields are supported in this version (See list below).
 
 ## How to use the code
 
@@ -23,8 +23,9 @@ Here's an example piece of code. Other examples can be found in the unit test cl
 ```python:
 
     import os
-    from vsmetaEncoder.vsmetaMovieEncoder import VsMetaMovieEncoder
-    from vsmetaEncoder.vsmetaInfo import VsMetaInfo
+    from datetime import date 
+    from vsmetaCodec.vsmetaMovieEncoder import VsMetaMovieEncoder
+    from vsmetaCodec.vsmetaInfo import VsMetaInfo
     
     class writeVsMetaForMovie():
 
@@ -33,15 +34,15 @@ Here's an example piece of code. Other examples can be found in the unit test cl
             writer = VsMetaMovieEncoder()
 
             info = writer.info
-            info.episodeTitle = 'Nach der Hochzeit'
             info.showTitle = 'Kino - Filme'
-            info.setEpisodeDate(date(2021, 3, 8))
+            info.episodeTitle = 'Nach der Hochzeit'
+            info.episodeReleaseDate = date(2021, 3, 8)
             info.chapterSummary = 'Um die drohende Schließung seines indischen Waisenhauses abzuwenden...'
 
             writeVsMetaFile(os.path.join(os.path.dirname(os.path.realpath(__file__)),'videp.mp4.vsmeta'), writer.encode(info))
 ```
 
-The code is available on PyPI and can be installed with command `pip install vsMetaEncoder`.
+The code will be available on PyPI soon and can be installed with command `pip install vsMetaCodec`.
 
 
 # Field mapping
@@ -50,54 +51,61 @@ Here's how to use the vsMetaInfo class for the different media types.
 
 ## Series
 
-To encode the episode of a series, use the `vsMetaInfo` class with a `vsMetaSeriesEncoder`. Have a look at the test classes to see how it works best. The table below describes how to set the `vsMetaInfo` properties.
+To encode the episode of a series, use the `vsMetaInfo` class with a `vsMetaSeriesEncoder`.
+Have a look at the test classes to see how it works best. The table below describes how to set the `vsMetaInfo` properties.
 
-Field in Video Station | vsMetaInfo property | Remark
----------------------- | ------------------- | ----------------
-TV Show Name           | `showTitle`
-Publishing Date        | `setEpisodeReleaseDate()` | Use method instead of direct value assignment.
-Episode Title          | `episodeTitle`
-Season                 | `season`            | If not set, defaulted with publishing year of episode.
-Episode                | `episode`           | If not set, defaulted with week number x 10 plus weekday number (Monday is 1).
-Publishing Date (Episode)| `setShowDate()`   | Use method instead of direct value assignment.
-Locked                 | `episodeLocked`
-Summary                | `chapterSummary`
-
-Not supported yet:
-
-* Classification
-* Rating
-* Genre
-* Cast
-* Author
+| Field in Video Station    | vsMetaInfo property       | Remark                                                                      |
+|---------------------------|---------------------------|-----------------------------------------------------------------------------|
+| TV Show Name              | `showTitle`               | assign any tv show name as text of type 'str'                               |
+| Episode Title             | `episodeTitle`            | assign any text of type 'str'                                               |
+| Publishing Date           | `episodeReleaseDate`      | assign any date of type 'date' or 'str' in ISO format                       |
+| Season                    | `season`                  | type int: If not set, defaulted with publishing year of episode.            |
+| Episode                   | `episode`                 | type int: If not set, defaulted with week no. x 10 + weekday no. (Monday=1) |
+| Publishing Date (Episode) | `tvshowReleaseDate`       | assign any date of type 'date' or 'str' in ISO format                       |
+| Poster (of Serie)         | `posterImageInfo.image`   | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
+| Locked                    | `episodeLocked`           | assign 'True' if 'VideoStation' may not alter the vsmeta file content       |
+| Summary                   | `chapterSummary`          | assign any text of type 'str'                                               |
+| Classification            | `classification`          | assign any text of type 'str'                                               |
+| Rating                    | `rating`                  | assign any float value in the range of 0.0. to 10.0 or -1.0 for unknown     |
+| Cast                      | `list.cast[]`             | append 'actor names' of type 'str' to the list                              |
+| Genre                     | `list.genre[]`            | append 'genres' of type 'str' to the list, e.g. 'Drama', 'Action'           |
+| Director                  | `list.director[]`         | append 'director names' of type 'str' to the list                           |
+| Writer                    | `list.writer[]`           | append 'author names' of type 'str' to the list                             |
+| Poster (of Episode)       | `episodeImageInfo.image`  | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
+| Background (of Serie)     | `backdropImageInfo.image` | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
 
 ## Movies
 
-To encode a TV film or movie, use the `vsMetaInfo` class with a `vsMetaMoviesEncoder`. The property names might be confusing, don't think too much about it - just use them as listed below.
+To encode a TV film or movie, use the `vsMetaInfo` class with a `vsMetaMoviesEncoder`.
+The property names might be confusing, don't think too much about it - just use them as listed below.
 
-Field in Video Station | vsMetaInfo property | Remark
----------------------- | ------------------- | ----------------
-Title                  | `showTitle`
-Short Title            | `episodeTitle`
-Publishing Date        | `setEpisodeDate()`   | Use method instead of direct value assignment.
-Locked                 | `episodeLocked`
-Summary                | `chapterSummary`
-
-Not supported yet: 
-
-* Classification
-* Rating
-* Genre
-* Cast
-* Author
+| Field in Video Station    | vsMetaInfo property       | Remark                                                                      |
+|---------------------------|---------------------------|-----------------------------------------------------------------------------|
+| Title                     | `showTitle`               | assign any title text of type 'str'                                         |
+| Short Title               | `episodeTitle`            | assign any short title text of type 'str'                                   |
+| Publishing Date           | `episodeReleaseDate`      | assign any date of type 'date' or 'str' in ISO format                       |
+| Season                    | `season`                  | N/A - not used, set to 0                                                    |
+| Episode                   | `episode`                 | N/A - not used, set to 0                                                    |
+| Publishing Date (Episode) | `tvshowReleaseDate`       | N/A - not used, set to 1900-01-01                                           |
+| Poster (of Serie)         | `posterImageInfo.image`   | N/A - not used, set to VsImageInfo()                                        |
+| Locked                    | `episodeLocked`           | assign 'True' if 'VideoStation' may not alter the vsmeta file content       |
+| Summary                   | `chapterSummary`          | assign any text of type 'str'                                               |
+| Classification            | `classification`          | assign any text of type 'str'                                               |
+| Rating                    | `rating`                  | assign any float value in the range of 0.0. to 10.0 or -1.0 for unknown     |
+| Cast                      | `list.cast[]`             | append 'actor names' of type 'str' to the list                              |
+| Genre                     | `list.genre[]`            | append 'genres' of type 'str' to the list, e.g. 'Drama', 'Action'           |
+| Director                  | `list.director[]`         | append 'director names' of type 'str' to the list                           |
+| Writer                    | `list.writer[]`           | append 'author names' of type 'str' to the list                             |
+| Poster (of Movie)         | `episodeImageInfo.image`  | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
+| Background (of Movie)     | `backdropImageInfo.image` | assign a jpg-image as bytestring (the md5-hash is calculated automatically) |
 
 ## Media type 'other'
 
 This media type is not supported, and probably won't. It is intended for private videos or artwork, which will be edited most likely manually at uploading.
 
-## Screen shots of the property screens for the media types
+## Screenshots of the property screens for the media types
 
-Here are the screenshots of the supported media types in German English (I did not had English screenshots at hand - please add them if you have).
+Here are the screenshots of the supported media types in German English (I did not have English screenshots at hand - please add them if you have).
 
 ![Properties of series](doc/properties_series.png) ![Properties of movies](doc/properties_movie.png)
 
