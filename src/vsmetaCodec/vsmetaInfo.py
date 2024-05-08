@@ -130,7 +130,7 @@ class VsMetaInfo:
     def timestamp(self, stamp: int | float):
         self._timestamp = int(stamp)         # if the parameter is float, cut of the milliseconds with int()
 
-    def printInfo(self, path: str):
+    def printInfo(self, path: str, prefix: str = None):
         path += "" if path[:-1] == "/" else "/"
 
         print("Title          : {0}".format(self.showTitle))
@@ -155,9 +155,9 @@ class VsMetaInfo:
         print("Episode Meta  :\n{0}".format(json.dumps(json.loads(self.episodeMetaJson), indent=3)))
 
         if self.backdropImageInfo is not None:
-            with open(path + "image_back_drop.jpg", "wb") as f:
+            with open(path + "image_back_drop.jpg" if not prefix else prefix + "_back_drop.jpg", "wb") as f:
                 f.write(self.backdropImageInfo.image)
 
         for idx, image_info in enumerate(self.episodeImageInfo):
-            with open(path + "image_poster_{0:02d}.jpg".format(idx + 1), "wb") as f:
+            with open(path + "image_poster_{0:02d}.jpg".format(idx + 1) if not prefix else prefix + "_poster_{0:02d}.jpg".format(idx + 1), "wb") as f:
                 f.write(image_info.image)
