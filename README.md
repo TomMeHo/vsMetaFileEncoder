@@ -109,6 +109,13 @@ Here are the screenshots of the supported media types in German English (I did n
 
 ![Properties of series](doc/properties_series.png) ![Properties of movies](doc/properties_movie.png)
 
+# How to contribute
+
+You're welcome to contribute, but please be aware of ...
+
+* You should provide a unit test for your changes with a good coverage. To do this, install ``nose2`` and ``coverage`` and execute the tests with 
+* I won't react immediately with checking your pull requests in.
+
 # References
 
 * Synology Video Station: 
