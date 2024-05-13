@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vsmetaEncoder"
-version = "0.9.1"
+version = "1.1.1"
 authors = [
   { name="Thomas Meder", email="tom@tommho.net" },
   { name="Bernd Frey", email="bfy@online.de" },

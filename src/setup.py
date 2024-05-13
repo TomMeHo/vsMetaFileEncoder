@@ -5,13 +5,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
       name='vsmetaCodec',
-      version='1.0.0',
+      version='1.1.1',
       description='A module to encode and decode media information with Synology\'s vsmeta file format.',
       long_description=long_description,
       long_description_content_type="text/markdown",
       url='https://github.com/berfre/vsMetaFileCodec',
-      author='Bernd Frey',
-      author_email='bfy@online.de',
+      author='Thomas Meder',
+      author_email='tom@tommho.net',
       license='BSD',
       packages=setuptools.find_packages(),
       zip_safe=False,
@@ -24,5 +24,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
         "Topic :: System :: Logging"
       ],
-      python_requires='>=3.6'
+      python_requires='>=3.8'
 )
