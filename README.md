@@ -18,8 +18,7 @@ Example: The video is called `video.mpg`, the metadata file shall be named `vide
 
 ## How to use the code
 
-Here's an example piece of code. Other examples can be found in the unit test classes.
-   * see also [search_check.py](doc/search_check.py)
+Here's an example piece of code. Other examples can be found in the unit test classes. Please refer also to [search_check.py](doc/search_check.py).
 
 ```python:
 
@@ -115,18 +114,19 @@ Here are the screenshots of the supported media types in German English (I did n
 You're welcome to contribute, but please be aware of ...
 
 * You should provide a unit test for your changes with a good coverage. To do this, install ``nose2`` and ``coverage`` and execute the tests with:
-```sh
-$ python -m venv venv
-$ source venv/bin/activate
-$ pip install nose2
-$ pip install coverage
-$ nose2 --verbose
-test_encodeTemplate2 (testvsmetaSeriesEncoder.TestVsMetaEncoder.test_encodeTemplate2) ... ok
-test_encodeTemplate3 (testvsmetaSeriesEncoder.TestVsMetaEncoder.test_encodeTemplate3) ... ok
-test_encodeTemplate4 (testvsmetaSeriesEncoder.TestVsMetaEncoder.test_encodeTemplate4) ... ok
-(...)
-```
-* I won't react immediately with checking your pull requests in.
+
+    ```sh
+    $ python -m venv venv
+    $ source venv/bin/activate
+    $ pip install nose2
+    $ pip install coverage
+    $ nose2 --verbose
+    test_encodeTemplate2 (testvsmetaSeriesEncoder.TestVsMetaEncoder.test_encodeTemplate2) ... ok
+    test_encodeTemplate3 (testvsmetaSeriesEncoder.TestVsMetaEncoder.test_encodeTemplate3) ... ok
+    test_encodeTemplate4 (testvsmetaSeriesEncoder.TestVsMetaEncoder.test_encodeTemplate4) ... ok
+    (...)
+    ```
+* I won't react immediately with checking your pull requests in, but will try to do it within some days.
 
 # References
 
