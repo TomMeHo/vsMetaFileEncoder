@@ -1,4 +1,12 @@
 # About VsMetaFileCodec
+
+---
+**NOTE**
+
+Synology has deprecated VideoStation (faka DS Video). Therefore, it does not really make sense to further develop this archive. So, please consider it being deprecated. In case you need this for last-minute actions to get your videos archived and need therefore this code, please feel free to hand-in your suggestions. I'll archive this repo by end of 2024. 
+
+---
+
 ## Summary
 NAS manufacturer [Synology](https://www.synology.com/) provides, for its network attached storage devices (NAS), a video content manager called *Video Station*. The application enables the NAS to stream videos over your LAN. Information about these videos are stored in a local Postgres database and optionally by files with extension *.vsmeta*. The format is proprietary. 
 The tool provided here is able to read and write vsMetaFiles. The structure has been elaborated by reverse engineering and resources found [here](https://gist.github.com/soywiz/2c10feb1231e70aca19a58aca9d6c16a). Many thanks to [Carlos Ballesteros Velasco](https://github.com/soywiz).
