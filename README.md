@@ -3,7 +3,7 @@
 ---
 **NOTE**
 
-Synology has deprecated VideoStation (faka DS Video). Therefore, it does not really make sense to further develop this archive. So, please consider it being deprecated. In case you need this for last-minute actions to get your videos archived and need therefore this code, please feel free to hand-in your suggestions. I'll archive this repo by end of 2024. 
+Synology has deprecated VideoStation (faka DS Video). Therefore, it does not really make sense to further develop this repo. So, please consider it being deprecated. In case you need this for last-minute actions to get your videos archived and need therefore this code, please feel free to hand-in your suggestions. I'll archive this repo by end of 2024. 
 
 ---
 
